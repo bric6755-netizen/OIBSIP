@@ -191,6 +191,10 @@ OIBSIP/
 - [WannaCry Ransomware Analysis — CISA](https://www.cisa.gov/news-events/alerts/2017/05/12/indicators-associated-wannacry-ransomware)
 - [SMB Security Best Practices — Microsoft](https://docs.microsoft.com/en-us/windows-server/storage/file-server/troubleshoot/detect-enable-and-disable-smbv1-v2-v3)
 
+  ## Demo Video
+[Watch Task 1 Demo](https://1drv.ms/v/c/18646ff513db828c/IQAgnbisTy8WTJPecFJF2rdTAX-S6b4FHi1Te6I_Q08u6WA?e=zPn8Yy)
+
+
 ---
 
 *Submitted as part of the AICTE Oasis Infobyte Security Analyst Internship Program — Task 1*
