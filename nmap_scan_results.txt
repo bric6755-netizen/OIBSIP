@@ -1,0 +1,209 @@
+========================================================
+  NMAP NETWORK SCAN RESULTS
+  Intern   : Richard Boakye Danquah
+  Task     : Task 1 — Basic Network Scanning with Nmap
+  Date     : 2026-06-02
+  Tool     : Nmap 7.99 (https://nmap.org)
+  OS       : Microsoft Windows 11 (Version 10.0.26200.8457)
+  Platform : i686-pc-windows-windows
+========================================================
+
+--------------------------------------------------------
+SYSTEM INFORMATION (ipconfig)
+--------------------------------------------------------
+Hostname : Richard
+
+Adapter: vEthernet (Default Switch) — Hyper-V Virtual Switch
+  IPv4 Address : 172.22.144.1
+  Subnet Mask  : 255.255.240.0
+  Gateway      : (none)
+
+Adapter: WiFi (Active)
+  IPv4 Address : 192.168.43.78
+  Subnet Mask  : 255.255.255.0
+  Default Gateway : 192.168.43.1
+
+Note: Ethernet and wireless virtual adapters showed "Media disconnected".
+
+--------------------------------------------------------
+SCAN 1: Basic Port Scan — Localhost (127.0.0.1)
+Command : nmap 127.0.0.1
+Time    : 2026-06-02 05:16 +0100
+--------------------------------------------------------
+Host is up (0.00036s latency).
+Not shown: 997 closed tcp ports (reset)
+
+PORT     STATE  SERVICE
+135/tcp  open   msrpc
+445/tcp  open   microsoft-ds
+2179/tcp open   vmrdp
+
+Nmap done: 1 IP address (1 host up) scanned in 0.45 seconds
+
+[ANALYSIS]
+- 997 ports actively refused connection (reset state).
+- 3 ports open — see Scan 2 for detailed service analysis.
+
+--------------------------------------------------------
+SCAN 2: Service & Version Detection — Localhost (127.0.0.1)
+Command : nmap -sV 127.0.0.1
+Time    : 2026-06-02 05:16 +0100
+--------------------------------------------------------
+Host is up (0.00098s latency).
+Not shown: 997 closed tcp ports (reset)
+
+PORT     STATE  SERVICE       VERSION
+135/tcp  open   msrpc         Microsoft Windows RPC
+445/tcp  open   microsoft-ds  (Windows SMB)
+2179/tcp open   vmrdp         (Hyper-V Remote Desktop)
+
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+Nmap done: 1 IP address (1 host up) scanned in 21.76 seconds
+
+[PORT ANALYSIS]
+PORT 135 — Microsoft Windows RPC (Remote Procedure Call)
+  - Used by Windows for inter-process communication (IPC).
+  - Required by DCOM, WMI, and Task Scheduler services.
+  - Security Note: Historically exploited by the Blaster worm (MS03-026).
+    Must be blocked at the network perimeter; not required externally.
+
+PORT 445 — SMB (Server Message Block / microsoft-ds)
+  - Primary Windows protocol for file sharing, printer sharing, and
+    Active Directory domain communication.
+  - Security Note: Exploited by EternalBlue (MS17-010), which powered
+    WannaCry and NotPetya ransomware in 2017. Must be patched (KB4012212+)
+    and blocked from internet-facing interfaces.
+
+PORT 2179 — VMRDP (Hyper-V Virtual Machine RDP)
+  - Enables remote desktop access to Hyper-V virtual machines.
+  - Confirmed by the presence of the vEthernet (Default Switch) adapter
+    (172.22.144.1) found in ipconfig — Hyper-V is actively installed.
+  - Security Note: Disable if remote VM access is not needed.
+
+--------------------------------------------------------
+SCAN 3: Aggressive Scan — Local Machine (192.168.43.78)
+Command : nmap -A 192.168.43.78
+Time    : 2026-06-02 05:17 +0100
+--------------------------------------------------------
+Host is up (0.00065s latency).
+Not shown: 996 closed tcp ports (reset)
+
+PORT     STATE  SERVICE       VERSION
+135/tcp  open   msrpc         Microsoft Windows RPC
+139/tcp  open   netbios-ssn   Microsoft Windows netbios-ssn
+445/tcp  open   microsoft-ds  (Windows SMB)
+2179/tcp open   vmrdp         (Hyper-V RDP)
+
+Device Type  : General Purpose
+OS Detected  : Microsoft Windows 11 24H2 – 25H2
+OS CPE       : cpe:/o:microsoft:windows_11
+Network Dist : 0 hops (local machine)
+Service Info : OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host Script Results:
+  smb2-time:
+    date       : 2026-06-02T04:18:11
+    start_date : N/A
+  smb2-security-mode:
+    SMB dialect: 3.1.1
+    Message signing: ENABLED AND REQUIRED
+
+Nmap done: 1 IP address (1 host up) scanned in 37.90 seconds
+
+[PORT ANALYSIS]
+PORT 135 — Microsoft RPC (see Scan 2 above)
+
+PORT 139 — NetBIOS Session Service
+  - Legacy Windows protocol for file/printer sharing over TCP/IP.
+  - Can leak NetBIOS names and workgroup details during network enumeration.
+  - Security Note: Disable via Network Adapter → IPv4 → Advanced → WINS
+    if legacy file sharing is not required on the network.
+
+PORT 445 — SMB with SMB2 Security Details
+  - SMB dialect 3.1.1 detected — the most current and secure version.
+  - Message signing is ENABLED AND REQUIRED — this is a strong security
+    configuration that protects against man-in-the-middle (MITM) relay
+    attacks such as NTLM relay attacks.
+  - Security Note: Despite good SMB signing config, the port should still
+    be restricted to trusted networks only.
+
+PORT 2179 — Hyper-V RDP (see Scan 2 above)
+
+OS DETECTION NOTE:
+  - Nmap successfully identified the OS as Windows 11 24H2–25H2.
+  - This confirms that OS fingerprinting via TCP/IP stack analysis works
+    even on fully patched, modern systems — highlighting the importance of
+    minimizing open ports to reduce fingerprinting exposure.
+
+--------------------------------------------------------
+SCAN 4: Full Subnet Scan — 192.168.43.0/24
+Command : nmap 192.168.43.0/24
+Time    : 2026-06-02 05:19 +0100
+--------------------------------------------------------
+Nmap scan report for 192.168.43.1  [HOTSPOT/GATEWAY]
+Host is up (0.016s latency).
+PORT   STATE  SERVICE
+53/tcp open   domain
+MAC Address: 08:97:98:08:B3:2C (Compal Information — Kunshan)
+
+Nmap scan report for Richard (192.168.43.78)  [THIS MACHINE]
+Host is up (0.0014s latency).
+PORT     STATE  SERVICE
+135/tcp  open   msrpc
+139/tcp  open   netbios-ssn
+445/tcp  open   microsoft-ds
+2179/tcp open   vmrdp
+
+Nmap done: 256 IP addresses (2 hosts up) scanned in 8.13 seconds
+
+[ANALYSIS]
+- 256 IPs scanned; only 2 hosts were active:
+    192.168.43.1  — Android mobile hotspot (gateway)
+    192.168.43.78 — This Windows 11 machine (hostname: Richard)
+- No unexpected/unknown devices found on the subnet.
+
+PORT 53 — DNS (Gateway / Android Hotspot)
+  - The hotspot device runs dnsmasq for DNS and DHCP services.
+  - All DNS queries from connected devices route through this port.
+  - Security Note: If using a public or shared hotspot, DNS traffic is
+    visible to the hotspot operator — use a trusted VPN or DNS-over-HTTPS
+    to mitigate DNS snooping.
+
+--------------------------------------------------------
+SCAN 5: Service Version Detection + Save to File
+Command : nmap -sV 127.0.0.1 -oN nmap_scan_results.txt
+Time    : 2026-06-02 05:19 +0100
+--------------------------------------------------------
+(Results consistent with Scan 2 — confirmed stable open ports.)
+Host is up (0.0011s latency). Scanned in 21.73 seconds.
+
+========================================================
+  COMPLETE FINDINGS SUMMARY
+========================================================
+
+HOST             PORT    SERVICE         RISK     NOTES
+192.168.43.78    135     MS-RPC          Medium   Block at perimeter
+192.168.43.78    139     NetBIOS-SSN     Medium   Disable if not needed
+192.168.43.78    445     SMB (ds)        High     Patch MS17-010; SMB signing ON
+192.168.43.78    2179    Hyper-V RDP     Low      Disable if VMs unused
+192.168.43.1     53      DNS (dnsmasq)   Low      Old version; low-risk hotspot
+
+OS CONFIRMED     : Microsoft Windows 11 (Build 26200.8457) — 24H2/25H2
+SMB SECURITY     : SMB 3.1.1 with message signing required (GOOD)
+HOSTS ON SUBNET  : 2 of 256 IPs active (clean network)
+
+========================================================
+  SECURITY RECOMMENDATIONS
+========================================================
+1. Keep Windows 11 fully updated — especially SMB-related patches.
+2. Enable Windows Firewall rules to block ports 135, 139, 445 from
+   untrusted or public network interfaces.
+3. Disable NetBIOS over TCP/IP if legacy Windows sharing is not needed.
+4. Disable Hyper-V if virtual machines are not actively in use — this
+   also removes the vEthernet adapter and closes port 2179.
+5. SMB message signing is already enforced — maintain this configuration.
+6. Avoid sensitive activity on mobile hotspots; use a VPN where possible.
+
+========================================================
+  END OF REPORT
+========================================================
