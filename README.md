@@ -173,3 +173,8 @@ sudo ufw --force reset
 ---
 
 *Part of the AICTE Oasis Infobyte Security Analyst Internship — Task 2*
+
+## 🎥 Demo Video
+
+▶️ [Click here to watch the Task 2 Demo Video](https://1drv.ms/v/c/18646ff513db828c/IQDmr3XSM-kfS4jj4p1FKEaeAXE3CrkmKwuynVbgsNW4ZPE?e=fjrqzI)
+
